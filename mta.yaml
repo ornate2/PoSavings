@@ -1,0 +1,132 @@
+_schema-version: "3.1"
+ID: PoSavings
+description: A simple CAP project.
+version: 1.0.0
+modules:
+  - name: PoSavings-srv
+    type: nodejs
+    path: gen/srv
+    requires:
+      - name: PoSavings-db
+      - name: uaa_PoSavings
+    provides:
+      - name: srv-api
+        properties:
+          srv-url: ${default-url}
+    parameters:
+      buildpack: nodejs_buildpack
+      readiness-health-check-http-endpoint: /health
+      readiness-health-check-type: http
+    build-parameters:
+      builder: npm
+  - name: PoSavings-db-deployer
+    type: hdb
+    path: gen/db
+    requires:
+      - name: PoSavings-db
+    parameters:
+      buildpack: nodejs_buildpack
+  - name: PoSavings-destination-content
+    type: com.sap.application.content
+    requires:
+      - name: PoSavings-destination-service
+        parameters:
+          content-target: true
+      - name: PoSavings_html_repo_host
+        parameters:
+          service-key:
+            name: PoSavings_html_repo_host-key
+      - name: uaa_PoSavings
+        parameters:
+          service-key:
+            name: uaa_PoSavings-key
+    parameters:
+      content:
+        instance:
+          destinations:
+            - Name: PoSavings_PoSavings_html_repo_host
+              ServiceInstanceName: PoSavings-html5-app-host-service
+              ServiceKeyName: PoSavings_html_repo_host-key
+              sap.cloud.service: PoSavings
+            - Authentication: OAuth2UserTokenExchange
+              Name: PoSavings_uaa_PoSavings
+              ServiceInstanceName: PoSavings-xsuaa-service
+              ServiceKeyName: uaa_PoSavings-key
+              sap.cloud.service: PoSavings
+          existing_destinations_policy: ignore
+    build-parameters:
+      no-source: true
+  - name: PoSavings-app-content
+    type: com.sap.application.content
+    path: .
+    requires:
+      - name: PoSavings_html_repo_host
+        parameters:
+          content-target: true
+    build-parameters:
+      build-result: resources
+      requires:
+        - artifacts:
+            - workflowui.zip
+          name: workflowui
+          target-path: resources/
+  - name: workflowui
+    type: html5
+    path: app/workflow-ui
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm install
+        - npm run build:cf
+      supported-platforms:
+        []
+resources:
+  - name: PoSavings-db
+    type: com.sap.xs.hdi-container
+    parameters:
+      service: hana
+      service-plan: hdi-shared
+  - name: PoSavings-destination-service
+    type: org.cloudfoundry.managed-service
+    parameters:
+      config:
+        HTML5Runtime_enabled: true
+        init_data:
+          instance:
+            destinations:
+              - Authentication: NoAuthentication
+                Name: ui5
+                ProxyType: Internet
+                Type: HTTP
+                URL: https://ui5.sap.com
+            existing_destinations_policy: update
+        version: 1.0.0
+      service: destination
+      service-name: PoSavings-destination-service
+      service-plan: lite
+  - name: PoSavings_html_repo_host
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: html5-apps-repo
+      service-name: PoSavings-html5-app-host-service
+      service-plan: app-host
+  - name: uaa_PoSavings
+    type: org.cloudfoundry.managed-service
+    parameters:
+      path: ./xs-security.json
+      service: xsuaa
+      service-name: PoSavings-xsuaa-service
+      service-plan: application
+      config:
+        xsappname: PoSavings-${org}-${space}
+        tenant-mode: dedicated
+parameters:
+  deploy_mode: html5-repo
+  enable-parallel-deployments: true
+build-parameters:
+  before-all:
+    - builder: custom
+      commands:
+        - npm ci
+        - npx cds build --production

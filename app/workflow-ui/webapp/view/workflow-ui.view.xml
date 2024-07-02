@@ -1,0 +1,40 @@
+<mvc:View
+    controllerName="workflowui.controller.workflow-ui"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    displayBlock="true">
+    <Page id="page" title="{i18n>title}">
+        <content>
+            <!-- Table to display Purchase Orders -->
+            <Table id="poTable" items="{/ProcessAutomations}">
+                <headerToolbar>
+                    <Toolbar>
+                        <Title text="{i18n>title}"/>
+                        <ToolbarSpacer/>
+                        <Button text="{i18n>triggerWorkflow}" press="onTriggerWorkflow"/>
+                    </Toolbar>
+                </headerToolbar>
+                <columns>
+                    <Column>
+                        <Text text="{i18n>poNumber}"/>
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>savings}"/>
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>triggerStatus}"/>
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem>
+                        <cells>
+                            <Text text="{PONumber}"/>
+                            <Text text="{Savings}"/>
+                            <Text text="{TriggerStatus}"/>
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+    </Page>
+</mvc:View>

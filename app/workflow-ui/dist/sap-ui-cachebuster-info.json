@@ -1,0 +1,22 @@
+{
+  "i18n/i18n.properties": 1719912131034,
+  "Component.js": 1719903173727,
+  "controller/workflow-ui.controller.js": 1719912708721,
+  "controller/App.controller.js": 1719903173739,
+  "manifest.json": 1719912750608,
+  "model/models.js": 1719903173735,
+  "Component-dbg.js": 1719903173727,
+  "Component.js.map": 1719912750823,
+  "controller/workflow-ui-dbg.controller.js": 1719912708721,
+  "controller/workflow-ui.controller.js.map": 1719912750829,
+  "controller/App-dbg.controller.js": 1719903173739,
+  "controller/App.controller.js.map": 1719912750821,
+  "model/models-dbg.js": 1719903173735,
+  "model/models.js.map": 1719912750823,
+  "Component-preload.js": 1719912751063,
+  "Component-preload.js.map": 1719912751063,
+  "view/workflow-ui.view.xml": 1719912685841,
+  "view/App.view.xml": 1719903173743,
+  "css/style.css": 1719903173739,
+  "index.html": 1719903173731
+}
